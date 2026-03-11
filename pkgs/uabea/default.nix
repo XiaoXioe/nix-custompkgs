@@ -49,9 +49,6 @@ stdenv.mkDerivation (finalAttrs: {
     mkdir -p $out/opt/uabea $out/bin
     cp -r * $out/opt/uabea/
 
-    # KUNCI PERUBAHAN:
-    # Kita tidak lagi menggunakan $out/opt/uabea/UABEAvalonia
-    # Kita panggil binary 'dotnet' dari Nix, lalu tambahkan flag untuk mengeksekusi .dll-nya.
     makeWrapper ${dotnet-runtime_8}/bin/dotnet $out/bin/uabea \
       --add-flags "$out/opt/uabea/UABEAvalonia.dll" \
       --set DOTNET_ROLL_FORWARD "Major" \

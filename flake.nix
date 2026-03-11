@@ -14,6 +14,7 @@
     {
       packages.${system} = {
         uabea = pkgs.callPackage ./pkgs/uabea/default.nix { };
+        vm = pkgs.callPackage ./pkgs/vimms-lair/default.nix { };
 
       };
     };
