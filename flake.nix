@@ -15,7 +15,7 @@
       packages.${system} = {
         uabea = pkgs.callPackage ./pkgs/uabea/default.nix { };
         vimmdl = pkgs.callPackage ./pkgs/vimms-lair/default.nix { };
-
+        freqtrade = pkgs.callPackage ./pkgs/freqtrade/default.nix { };
       };
     };
 }
