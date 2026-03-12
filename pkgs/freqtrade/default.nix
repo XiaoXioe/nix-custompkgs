@@ -1,4 +1,5 @@
 {
+  lib,
   buildFHSEnv,
   writeScript,
   writeShellScriptBin,
@@ -56,6 +57,15 @@ let
     exec freqtrade "$@"
   '';
 in
-writeShellScriptBin "freqtrade" ''
+(writeShellScriptBin "freqtrade" ''
   ${fhs}/bin/freqtrade-env ${initScript} "$@"
-''
+'').overrideAttrs
+  (old: {
+    meta = with lib; {
+      description = "Free, open source crypto trading bot (Standalone FHS + Venv)";
+      homepage = "https://github.com/freqtrade/freqtrade";
+      license = licenses.gpl3Only;
+      maintainers = [ "XiaoXioe" ];
+      mainProgram = "freqtrade";
+    };
+  })
