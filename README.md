@@ -9,4 +9,4 @@ Repositori ini sepenuhnya ditenagai oleh **Nix Flakes** untuk menjamin integrasi
 Kamu tidak perlu menginstal paket-paket ini secara permanen. Jika sistemmu sudah mendukung Nix Flakes, kamu bisa langsung mengeksekusi aplikasinya dari terminal (contoh di bawah menggunakan paket `uabea`):
 
 ```bash
-nix run github:XiaoXioe>/nix-custompkgs#uabea
+nix run github:XiaoXioe/nix-custompkgs#uabea
