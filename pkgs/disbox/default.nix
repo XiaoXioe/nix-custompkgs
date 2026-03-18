@@ -8,12 +8,9 @@ let
   pname = "disbox";
   version = "3.7.5";
 
-  # Pastikan URL sesuai dengan nama file aset rilis di GitHub Disbox
   src = fetchurl {
     url = "https://github.com/naufal-backup/disbox/releases/download/v${version}/Disbox-Linux-x64.AppImage";
 
-    # Dapatkan hash yang valid dengan menjalankan:
-    # nix-prefetch-url https://github.com/naufal-backup/disbox/releases/download/v3.7.5/Disbox-3.7.5.AppImage
     sha256 = "sha256:9d37b3df768e97c214f128f33b3ac58d7cb34fb701a92a747779d8a44b6ff973";
   };
 
