@@ -4,7 +4,7 @@
   fetchFromGitHub,
 }:
 
-python3.pkgs.buildPythonApplication (finalAttrs: {
+python3.pkgs.buildPythonApplication {
   pname = "vimmdl";
   version = "0-unstable-2025-05-21";
   pyproject = true;
@@ -47,7 +47,6 @@ python3.pkgs.buildPythonApplication (finalAttrs: {
     description = "Command Line tool to search and download roms from Vimm's Lair";
     homepage = "https://github.com/devvratmiglani/Vimmdl";
     license = lib.licenses.mit;
-    maintainers = with lib.maintainers; [ ];
     mainProgram = "vm";
   };
-})
+}
