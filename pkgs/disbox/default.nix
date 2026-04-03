@@ -6,7 +6,7 @@
 
 let
   pname = "disbox";
-  version = "4.0.0";
+  version = "4.8.8";
 
   src = fetchurl {
     url = "https://github.com/naufal-backup/disbox/releases/download/v${version}/Disbox-Linux-x64.AppImage";
