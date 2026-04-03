@@ -19,19 +19,9 @@ in
 appimageTools.wrapType2 {
   inherit pname version src;
 
-  # Mengekstrak ikon dan file .desktop agar Disbox muncul di menu aplikasi KDE Plasma / Cinnamon
-  # extraInstallCommands = ''
-  #   install -m 444 -D ${appimageContents}/disbox.desktop -t $out/share/applications
-  #   cp -r ${appimageContents}/usr/share/icons/hicolor/0x0/apps $out/share
-  #   substituteInPlace $out/share/applications/disbox.desktop \
-  #     --replace 'Exec=AppRun' 'Exec=${pname}'
-  # '';
   extraInstallCommands = ''
-    # Kita ambil dari folder 0x0 yang aneh itu,
-    # tapi kita simpan ke folder 512x512 agar sistem bisa membacanya.
-    # Flag -D akan membuatkan folder share/icons/hicolor/512x512/apps/ secara otomatis.
 
-    install -m 444 -D ${appimageContents}/usr/share/icons/hicolor/0x0/apps/disbox.png \
+    install -m 444 -D ${appimageContents}/usr/share/icons/hicolor/32x32/apps/disbox.png \
       $out/share/icons/hicolor/512x512/apps/disbox.png
 
     # Install file desktop
