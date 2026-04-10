@@ -6,12 +6,12 @@
 
 let
   pname = "disbox";
-  version = "4.8.8";
+  version = "4.9.2";
 
   src = fetchurl {
     url = "https://github.com/naufal-backup/disbox/releases/download/v${version}/Disbox-Linux-x64.AppImage";
 
-    sha256 = "sha256-G7/SL1vc9FK8trknToZBKA161SpnwlvxqAZcj0ijQ48=";
+    sha256 = "sha256-uWb4RSgph+YdDtHbtRPU0Nl7KC/RtCiyzv7WLjMbv0A=";
   };
 
   appimageContents = appimageTools.extractType2 { inherit pname version src; };
