@@ -108,6 +108,9 @@ stdenv.mkDerivation rec {
 
   meta = with lib; {
     description = "Binance Desktop App";
+    homepage = "https://www.binance.com";
+    license = licenses.unfree;
+    sourceProvenance = with sourceTypes; [ binaryNativeCode ];
     mainProgram = "binance";
     platforms = platforms.linux;
   };
