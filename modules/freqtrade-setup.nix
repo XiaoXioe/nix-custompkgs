@@ -201,6 +201,11 @@ in
       globalWrapper
     ];
 
+    home.shellAliases = {
+      freqtrade-venv = "export LD_LIBRARY_PATH=\"${cLibs}\${LD_LIBRARY_PATH:+:}\$LD_LIBRARY_PATH\" && export PYTHONWARNINGS=\"ignore:The HMAC key is\" && source ${cfg.configDir}/.venv/bin/activate";
+    };
+
+
     # GENERATOR SYSTEMD USER SERVICES
     systemd.user.services = mkIf cfg.service.enable (
       mapAttrs' (
