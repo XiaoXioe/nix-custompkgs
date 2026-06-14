@@ -68,7 +68,7 @@ let
 
     if [ ! -d ".venv" ]; then
       echo "🐍 Membangun Virtual Environment..."
-      ${pkgs.python313}/bin/python -m venv .venv
+      ${cfg.pythonPackage}/bin/python -m venv .venv
     fi
 
     source .venv/bin/activate
@@ -159,6 +159,13 @@ in
       type = types.listOf types.str;
       default = [ ];
     };
+
+    pythonPackage = mkOption {
+      type = types.package;
+      default = pkgs.python313;
+      description = "Paket Python yang digunakan untuk membuat virtual environment Freqtrade.";
+    };
+
 
     service = {
       enable = mkEnableOption "Aktifkan otomatisasi background service (Systemd)";
