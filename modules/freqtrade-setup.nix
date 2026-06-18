@@ -203,6 +203,11 @@ in
                 default = [ ];
                 description = "Command ekstra yang dijalankan bersama bot (misal uvicorn)";
               };
+              disableLogs = mkOption {
+                type = types.bool;
+                default = false;
+                description = "Matikan output log ke journalctl (mencegah log penuh)";
+              };
             };
           }
         );
@@ -249,6 +254,8 @@ in
                 Service = {
                   Type = "simple";
                   WorkingDirectory = botCfg.strategiesDir;
+                  StandardOutput = if botCfg.disableLogs then "null" else null;
+                  StandardError = if botCfg.disableLogs then "null" else null;
 
                   Environment = [
                     "LD_LIBRARY_PATH=${cLibs}"
@@ -283,6 +290,8 @@ in
                 Service = {
                   Type = "simple";
                   WorkingDirectory = botCfg.strategiesDir;
+                  StandardOutput = if botCfg.disableLogs then "null" else null;
+                  StandardError = if botCfg.disableLogs then "null" else null;
                   Environment = [
                     "LD_LIBRARY_PATH=${cLibs}"
                     "PYTHONWARNINGS=ignore:The HMAC key is"
