@@ -208,6 +208,17 @@ in
                 default = false;
                 description = "Matikan output log ke journalctl (mencegah log penuh)";
               };
+              logToFile = mkOption {
+                type = types.bool;
+                default = false;
+                description = "Simpan log langsung ke file di user_data/logs/ daripada ke journalctl.";
+              };
+              memoryLimit = mkOption {
+                type = types.str;
+                default = "";
+                example = "4G";
+                description = "Batas maksimal RAM (mencegah OOM freeze). Kosongkan jika tanpa batas.";
+              };
             };
           }
         );
@@ -246,16 +257,20 @@ in
               "freqtrade-${botName}" = {
                 Unit = {
                   Description = "Freqtrade Daemon - ${botName}";
-                  After = [ "network.target" ];
-                  Wants = imap0 (i: _: "freqtrade-${botName}-extra-${toString i}.service") botCfg.extra;
+                  After = [ "network-online.target" "time-sync.target" ];
+                  Wants = [ "network-online.target" ] ++ imap0 (i: _: "freqtrade-${botName}-extra-${toString i}.service") botCfg.extra;
                 } // (if cfg.service.startupDelay != "" then {
                   # Kosongkan WantedBy jika menggunakan timer
                 } else {});
                 Service = {
                   Type = "simple";
                   WorkingDirectory = botCfg.strategiesDir;
-                  StandardOutput = if botCfg.disableLogs then "null" else null;
-                  StandardError = if botCfg.disableLogs then "null" else null;
+                  StandardOutput = if botCfg.disableLogs then "null" 
+                                   else if botCfg.logToFile then "append:${botCfg.strategiesDir}/user_data/logs/freqtrade-${botName}.log" 
+                                   else null;
+                  StandardError = if botCfg.disableLogs then "null" 
+                                  else if botCfg.logToFile then "append:${botCfg.strategiesDir}/user_data/logs/freqtrade-${botName}.log" 
+                                  else null;
 
                   Environment = [
                     "LD_LIBRARY_PATH=${cLibs}"
@@ -274,7 +289,11 @@ in
 
                   Restart = "always";
                   RestartSec = "10s";
-                };
+                } // (if botCfg.logToFile then {
+                  ExecStartPre = "${pkgs.coreutils}/bin/mkdir -p ${botCfg.strategiesDir}/user_data/logs";
+                } else {}) // (if botCfg.memoryLimit != "" then {
+                  MemoryMax = botCfg.memoryLimit;
+                } else {});
               };
             };
             extraServices = listToAttrs (imap0 (i: cmd: 
@@ -282,7 +301,8 @@ in
                 Unit = {
                   Description = "Freqtrade Extra ${toString i} - ${botName}";
                   PartOf = [ "freqtrade-${botName}.service" ];
-                  After = [ "network.target" ];
+                  After = [ "network-online.target" "time-sync.target" ];
+                  Wants = [ "network-online.target" ];
                 };
                 Install = {
                   WantedBy = [ "freqtrade-${botName}.service" ];
@@ -290,8 +310,12 @@ in
                 Service = {
                   Type = "simple";
                   WorkingDirectory = botCfg.strategiesDir;
-                  StandardOutput = if botCfg.disableLogs then "null" else null;
-                  StandardError = if botCfg.disableLogs then "null" else null;
+                  StandardOutput = if botCfg.disableLogs then "null" 
+                                   else if botCfg.logToFile then "append:${botCfg.strategiesDir}/user_data/logs/freqtrade-${botName}-extra-${toString i}.log" 
+                                   else null;
+                  StandardError = if botCfg.disableLogs then "null" 
+                                  else if botCfg.logToFile then "append:${botCfg.strategiesDir}/user_data/logs/freqtrade-${botName}-extra-${toString i}.log" 
+                                  else null;
                   Environment = [
                     "LD_LIBRARY_PATH=${cLibs}"
                     "PYTHONWARNINGS=ignore:The HMAC key is"
@@ -299,7 +323,11 @@ in
                   ExecStart = "${pkgs.bash}/bin/bash -c 'source ${cfg.configDir}/.venv/bin/activate && exec ${cmd}'";
                   Restart = "always";
                   RestartSec = "10s";
-                };
+                } // (if botCfg.logToFile then {
+                  ExecStartPre = "${pkgs.coreutils}/bin/mkdir -p ${botCfg.strategiesDir}/user_data/logs";
+                } else {}) // (if botCfg.memoryLimit != "" then {
+                  MemoryMax = botCfg.memoryLimit;
+                } else {});
               }
             ) botCfg.extra);
             
