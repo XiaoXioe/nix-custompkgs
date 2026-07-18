@@ -3,6 +3,7 @@
   python3,
   fetchFromGitHub,
   fetchurl,
+  fetchPypi,
   autoPatchelfHook,
   stdenv,
   makeWrapper,
@@ -37,6 +38,8 @@ let
 
     buildInputs = [ stdenv.cc.cc.lib ];
 
+    pythonImportsCheck = [ "wreq" ];
+
     meta = {
       description = "Ergonomic Python HTTP client with TLS fingerprint emulation";
       homepage = "https://github.com/0x676e67/wreq-python";
@@ -50,8 +53,9 @@ let
     version = "0.8.1";
     format = "setuptools";
 
-    src = fetchurl {
-      url = "https://files.pythonhosted.org/packages/e7/44/ee4b9ead46ec5fcc4d9a303f6ac82cb17b0e188bfe629ef962c4046cded5/pysidesix_frameless_window-0.8.1.tar.gz";
+    src = fetchPypi {
+      pname = "pysidesix_frameless_window";
+      inherit version;
       sha256 = "95eefa64abdaca9d730bc097fd39e2cd07d3443a47a1645cc936a0076996d7cd";
     };
 
@@ -60,6 +64,8 @@ let
     ];
 
     doCheck = false;
+
+    pythonImportsCheck = [ "qframelesswindow" ];
 
     meta = {
       description = "A cross-platform frameless window based on PySide6";
@@ -74,8 +80,9 @@ let
     version = "1.11.2";
     format = "setuptools";
 
-    src = fetchurl {
-      url = "https://files.pythonhosted.org/packages/f1/22/01a72ab00873fac2575e8045cd4dfcb003afc0f0764982c706817be5629a/pyside6_fluent_widgets-1.11.2.tar.gz";
+    src = fetchPypi {
+      pname = "pyside6_fluent_widgets";
+      inherit version;
       sha256 = "cf49ff76b9b2ad1dc24f071a1b2a3f5f0a67d7adf655915071ddfb7342caf175";
     };
 
@@ -87,10 +94,85 @@ let
 
     doCheck = false;
 
+    pythonImportsCheck = [ "qfluentwidgets" ];
+
     meta = {
       description = "Fluent design widgets library for PySide6";
       homepage = "https://github.com/zhiyiYo/PyQt-Fluent-Widgets";
       license = lib.licenses.gpl3Only;
+    };
+  };
+
+  bidict = python3.pkgs.buildPythonPackage rec {
+    pname = "bidict";
+    version = "0.23.1";
+    format = "pyproject";
+
+    src = fetchPypi {
+      inherit pname version;
+      sha256 = "03069d763bc387bbd20e7d49914e75fc4132a41937fa3405417e1a5a2d006d71";
+    };
+
+    nativeBuildInputs = with python3.pkgs; [ setuptools ];
+
+    propagatedBuildInputs = with python3.pkgs; [
+      typing-extensions
+    ];
+
+    doCheck = false;
+  };
+
+  desktop-notifier = python3.pkgs.buildPythonPackage rec {
+    pname = "desktop-notifier";
+    version = "6.2.0";
+    format = "pyproject";
+
+    src = fetchPypi {
+      pname = "desktop_notifier";
+      inherit version;
+      sha256 = "528167b691ce40031fa92f67c9f452b7be29846613e19d11ec0c49cb5242d338";
+    };
+
+    nativeBuildInputs = with python3.pkgs; [ setuptools ];
+
+    propagatedBuildInputs = with python3.pkgs; [
+      dbus-fast
+      packaging
+      typing-extensions
+      bidict
+    ];
+
+    doCheck = false;
+
+    pythonImportsCheck = [ "desktop_notifier" ];
+
+    meta = {
+      description = "Python library for desktop notifications";
+      homepage = "https://github.com/samschott/desktop-notifier";
+      license = lib.licenses.mit;
+    };
+  };
+
+  darkdetect = python3.pkgs.buildPythonPackage rec {
+    pname = "darkdetect";
+    version = "0.8.0";
+    format = "pyproject";
+
+    nativeBuildInputs = with python3.pkgs; [ setuptools ];
+
+    src = fetchPypi {
+      inherit pname version;
+      sha256 = "b5428e1170263eb5dea44c25dc3895edd75e6f52300986353cd63533fe7df8b1";
+    };
+
+    doCheck = false;
+
+    pythonImportsCheck = [ "darkdetect" ];
+
+    meta = {
+      description = "Detect OS Dark Mode from Python";
+      homepage = "https://github.com/albertosottile/darkdetect";
+      license = lib.licenses.bsd3;
     };
   };
 in
@@ -118,7 +200,6 @@ python3.pkgs.buildPythonApplication rec {
   propagatedBuildInputs =
     (with python3.pkgs; [
       aioftp
-      desktop-notifier
       libtorrent-rasterbar
       loguru
       m3u8
@@ -128,6 +209,8 @@ python3.pkgs.buildPythonApplication rec {
       uvloop
     ])
     ++ [
+      desktop-notifier
+      darkdetect
       wreq
       pyside6-fluent-widgets
     ];
@@ -135,22 +218,22 @@ python3.pkgs.buildPythonApplication rec {
   dontBuild = true;
 
   installPhase = ''
-        runHook preInstall
+      runHook preInstall
 
-        # Create directories
-        mkdir -p $out/libexec/ghost-downloader-3
-        mkdir -p $out/bin
-        mkdir -p $out/share/applications
-        mkdir -p $out/share/icons/hicolor/512x512/apps
+      # Create directories
+      mkdir -p $out/libexec/ghost-downloader-3
+      mkdir -p $out/bin
+      mkdir -p $out/share/applications
 
-        # Copy files
-        cp -r * $out/libexec/ghost-downloader-3/
+      # Copy files
+      cp -r . $out/libexec/ghost-downloader-3/
 
-        # Install application icon
-        cp app/assets/logo.png $out/share/icons/hicolor/512x512/apps/ghost-downloader-3.png
+      # Install application icon
+      mkdir -p $out/share/icons/hicolor/512x512/apps
+      cp app/assets/logo.png $out/share/icons/hicolor/512x512/apps/ghost-downloader-3.png
 
-        # Generate desktop launcher file
-        cat > $out/share/applications/ghost-downloader-3.desktop <<EOF
+      # Generate desktop launcher file
+      cat > $out/share/applications/ghost-downloader-3.desktop <<EOF
     [Desktop Entry]
     Name=Ghost Downloader 3
     Comment=AI-boost multi-protocol concurrent downloader
@@ -159,19 +242,19 @@ python3.pkgs.buildPythonApplication rec {
     Terminal=false
     Type=Application
     Categories=Network;FileTransfer;
-    EOF
+EOF
 
-        # Create launcher script
-        cat > $out/bin/ghost-downloader-3 <<EOF
-    #!${python3.interpreter}
-    import sys
-    sys.path.insert(0, "$out/libexec/ghost-downloader-3")
-    import runpy
-    runpy.run_path("$out/libexec/ghost-downloader-3/Ghost-Downloader-3.py", run_name="__main__")
-    EOF
-        chmod +x $out/bin/ghost-downloader-3
+    # Create launcher script
+    cat > $out/bin/ghost-downloader-3 <<EOF
+#!${python3.interpreter}
+import sys
+sys.path.insert(0, "$out/libexec/ghost-downloader-3")
+import runpy
+runpy.run_path("$out/libexec/ghost-downloader-3/Ghost-Downloader-3.py", run_name="__main__")
+EOF
+    chmod +x $out/bin/ghost-downloader-3
 
-        runHook postInstall
+    runHook postInstall
   '';
 
   meta = {
