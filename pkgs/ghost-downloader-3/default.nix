@@ -108,6 +108,11 @@ python3.pkgs.buildPythonApplication rec {
 
   nativeBuildInputs = [ qt6.wrapQtAppsHook ];
 
+  postPatch = ''
+    substituteInPlace app/config/paths.py \
+      --replace-fail 'Path(".")' 'Path(__file__).resolve().parent.parent.parent'
+  '';
+
   buildInputs = [ qt6.qtbase ];
 
   propagatedBuildInputs =
@@ -158,8 +163,11 @@ python3.pkgs.buildPythonApplication rec {
 
         # Create launcher script
         cat > $out/bin/ghost-downloader-3 <<EOF
-    #!/bin/sh
-    exec ${python3.interpreter} $out/libexec/ghost-downloader-3/Ghost-Downloader-3.py "\$@"
+    #!${python3.interpreter}
+    import sys
+    sys.path.insert(0, "$out/libexec/ghost-downloader-3")
+    import runpy
+    runpy.run_path("$out/libexec/ghost-downloader-3/Ghost-Downloader-3.py", run_name="__main__")
     EOF
         chmod +x $out/bin/ghost-downloader-3
 
