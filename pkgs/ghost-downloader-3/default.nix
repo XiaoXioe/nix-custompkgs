@@ -195,7 +195,7 @@ python3.pkgs.buildPythonApplication rec {
       --replace-fail 'Path(".")' 'Path(__file__).resolve().parent.parent.parent'
   '';
 
-  buildInputs = [ qt6.qtbase ];
+  buildInputs = [ qt6.qtbase qt6.qtsvg ];
 
   propagatedBuildInputs =
     (with python3.pkgs; [
@@ -247,6 +247,8 @@ EOF
     # Create launcher script
     cat > $out/bin/ghost-downloader-3 <<EOF
 #!${python3.interpreter}
+import os
+os.environ["QT_PLUGIN_PATH"] = "${qt6.qtsvg}/lib/qt-6/plugins"
 import sys
 sys.path.insert(0, "$out/libexec/ghost-downloader-3")
 import runpy
